@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <link rel="stylesheet" href="C:\Users\alice\OneDrive\Documents\EFREI\JS alpine\Alpine Evaluation\Rick&Morty\style\background.css">  
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+</head>
+<!-- Inclusion d'Alpine.js -->
+<script src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js" defer></script>
+<body>
+    <!-- Initialisation d'Alpine.js avec un objet de données -->
+    <div x-data="{
+        characters: [],
+        selectedCharacter: null,
+        show: false,
+        getCharacters() {
+            // Récupération des données depuis l'API
+            fetch('https://rickandmortyapi.com/api/character')
+                .then(response => response.json())
+                .then(data => this.characters = data.results);
+        },
+        selectCharacter(character) {
+            // Sélection d'un personnage et affichage de la boîte modale
+            this.selectedCharacter = character;
+            // Récupération de plus d'informations depuis l'URL du personnage
+            fetch(character.url)
+                .then(response => response.json())
+                .then(data => {
+                    this.selectedCharacter.id = data.id;
+                    this.selectedCharacter.status = data.status;
+                    this.selectedCharacter.species = data.species;
+                    this.selectedCharacter.gender = data.gender;
+                    this.selectedCharacter.origin = data.origin.name;
+                    this.selectedCharacter.type = data.type;
+                    this.selectedCharacter.localisation.name = data.localisation.name;
+                });
+            this.show = true;
+        }
+    }" x-init="getCharacters">
+
+        <!-- En-tête de la page -->
+        <h1>Liste de Personnages Rick et Morty</h1>
+        
+        
+        <!-- Grille pour afficher les personnages -->
+        <div
+        >
+            <template x-for="character in characters" :key="character.id">
+                <!-- Carte pour chaque personnage -->
+                <div class="bg-white p-4">
+                    <!-- Image du personnage -->
+                    <img :src="character.image" alt="Character Image" class="w-full mb-2">
+                    <!-- Nom du personnage -->
+                    <p style="font-size: 30px;"x-text="character.name"></p>
+                    <!-- Bouton pour voir les détails du personnage -->
+                    <button @click="selectCharacter(character)">
+                        Voir Détails
+                    </button>
+                </div>
+            </template>
+        </div>
+
+        <!-- Boîte modale pour les détails du personnage -->
+        <div x-show="show" class="modal-container bg-white w-11/12 md:max-w-md mx-auto rounded shadow-lg z-50"
+            @click.outside="show=!show">
+            <div class="modal-content">
+                <!-- Détails du personnage -->
+                <p><span class="font-bold">API ID:</span> <span x-text="selectedCharacter ? selectedCharacter.id : ''"></span></p>
+                <p><span class="font-bold">Name:</span> <span x-text="selectedCharacter ? selectedCharacter.name : ''"></span></p>
+                <p><span class="font-bold">Statut:</span> <span x-text="selectedCharacter ? selectedCharacter.status : ''"></span></p>
+                <p><span class="font-bold">Species:</span> <span x-text="selectedCharacter ? selectedCharacter.species : ''"></span></p>
+                <p><span class="font-bold">Gender:</span> <span x-text="selectedCharacter ? selectedCharacter.gender : ''"></span></p>
+                <p><span class="font-bold">Origin:</span> <span x-text="selectedCharacter ? selectedCharacter.origin : ''"></span></p>
+                <p><span class="font-bold">Type:</span> <span x-text="selectedCharacter ? selectedCharacter.type : ''"></span></p>
+                <p><span class="font-bold">Localisation:</span> <span x-text="selectedCharacter ? selectedCharacter.localisation.name : ''"></span></p>
+            </div>
+        </div>
+    </div>
+
+</body>
+</html>
